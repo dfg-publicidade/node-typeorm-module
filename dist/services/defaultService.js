@@ -7,7 +7,7 @@ const typeOrmManager_1 = __importDefault(require("../datasources/typeOrmManager"
 /* Module */
 class Service {
     constructor(repositoryType, connectionName) {
-        this.deletedAtField = 'dataExclusao';
+        this.deletedAtField = 'deleted_at';
         this.defaultSorting = {};
         this.parentEntities = [];
         this.childEntities = [];

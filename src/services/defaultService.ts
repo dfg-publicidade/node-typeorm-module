@@ -4,7 +4,7 @@ import JoinType from '../enums/joinType';
 
 /* Module */
 abstract class Service<T> {
-    public deletedAtField: string = 'dataExclusao';
+    public deletedAtField: string = 'deleted_at';
 
     protected defaultSorting: any = {};
 

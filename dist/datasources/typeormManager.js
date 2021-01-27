@@ -11,14 +11,14 @@ const debug = debug_1.default('module:typeorm-manager');
 const connectionManager = typeorm_1.getConnectionManager();
 class TypeOrmManager {
     static async connect(config, name) {
-        debug('Solicitação de conexão recebida');
+        debug('Connection request received ');
         let conn;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
-            debug('Entregando conexão anteriormente realizada');
+            debug('Delivering previously done connection');
             return Promise.resolve(conn);
         }
         else {
-            debug('Efetuando nova conexão');
+            debug('Doing a new connection');
             const ormConfig = Object.assign({}, config);
             ormConfig.name = name;
             for (const entity of this.entities) {
@@ -27,25 +27,25 @@ class TypeOrmManager {
             conn = connectionManager.create(ormConfig);
             try {
                 conn = await conn.connect();
-                debug('Conexão realizada');
+                debug('Connection done');
                 return Promise.resolve(conn);
             }
             catch (error) {
-                debug('Erro na tentativa de conexão');
+                debug('Connection attempt error');
                 throw error;
             }
         }
     }
     static async close(name) {
-        debug('Finalizando conexão');
+        debug('Closing connection');
         try {
             if (connectionManager.get(name).isConnected) {
                 await connectionManager.get(name).close();
-                debug('Conexão finalizada');
+                debug('Connection closed');
             }
         }
         catch (error) {
-            debug('Erro ao finalizar a conexão');
+            debug('Connection close attempt error');
             throw error;
         }
     }
@@ -57,11 +57,11 @@ class TypeOrmManager {
     static async wait(config) {
         if (TypeOrmManager.getConnection(config.defaultName) && TypeOrmManager.getConnection(config.defaultName).isConnected) {
             await node_util_module_1.default.delay100ms();
-            debug('Aguardando finalização da conexão.');
+            debug('Waiting for connection.');
             return this.wait(config);
         }
         else {
-            debug('Conexão finalizada. Prosseguindo...');
+            debug('Connection closed. Proceeding...');
             return Promise.resolve();
         }
     }

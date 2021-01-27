@@ -11,15 +11,15 @@ class TypeOrmManager {
     protected static entities: any[] = [];
 
     public static async connect(config: any, name: string): Promise<Connection> {
-        debug('Solicitação de conexão recebida');
+        debug('Connection request received ');
 
         let conn: Connection;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
-            debug('Entregando conexão anteriormente realizada');
+            debug('Delivering previously done connection');
             return Promise.resolve(conn);
         }
         else {
-            debug('Efetuando nova conexão');
+            debug('Doing a new connection');
 
             const ormConfig: any = { ...config };
             ormConfig.name = name;
@@ -32,27 +32,29 @@ class TypeOrmManager {
 
             try {
                 conn = await conn.connect();
-                debug('Conexão realizada');
+
+                debug('Connection done');
+
                 return Promise.resolve(conn);
             }
             catch (error) {
-                debug('Erro na tentativa de conexão');
+                debug('Connection attempt error');
                 throw error;
             }
         }
     }
 
     public static async close(name: string): Promise<void> {
-        debug('Finalizando conexão');
+        debug('Closing connection');
 
         try {
             if (connectionManager.get(name).isConnected) {
                 await connectionManager.get(name).close();
-                debug('Conexão finalizada');
+                debug('Connection closed');
             }
         }
         catch (error) {
-            debug('Erro ao finalizar a conexão');
+            debug('Connection close attempt error');
             throw error;
         }
     }
@@ -66,11 +68,11 @@ class TypeOrmManager {
     public static async wait(config: any): Promise<void> {
         if (TypeOrmManager.getConnection(config.defaultName) && TypeOrmManager.getConnection(config.defaultName).isConnected) {
             await Util.delay100ms();
-            debug('Aguardando finalização da conexão.');
+            debug('Waiting for connection.');
             return this.wait(config);
         }
         else {
-            debug('Conexão finalizada. Prosseguindo...');
+            debug('Connection closed. Proceeding...');
             return Promise.resolve();
         }
     }
