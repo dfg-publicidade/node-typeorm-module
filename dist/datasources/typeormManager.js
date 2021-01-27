@@ -21,7 +21,9 @@ class TypeOrmManager {
             debug('Efetuando nova conexão');
             const ormConfig = Object.assign({}, config);
             ormConfig.name = name;
-            // ormConfig.entities.push(Colaborador);
+            for (const entity of this.entities) {
+                ormConfig.entities.push(entity);
+            }
             conn = connectionManager.create(ormConfig);
             try {
                 conn = await conn.connect();
@@ -64,4 +66,5 @@ class TypeOrmManager {
         }
     }
 }
+TypeOrmManager.entities = [];
 exports.default = TypeOrmManager;

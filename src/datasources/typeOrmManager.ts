@@ -8,6 +8,8 @@ const debug: appDebugger.IDebugger = appDebugger('module:typeorm-manager');
 const connectionManager: ConnectionManager = getConnectionManager();
 
 class TypeOrmManager {
+    protected static entities: any[] = [];
+
     public static async connect(config: any, name: string): Promise<Connection> {
         debug('Solicitação de conexão recebida');
 
@@ -22,7 +24,9 @@ class TypeOrmManager {
             const ormConfig: any = { ...config };
             ormConfig.name = name;
 
-            // ormConfig.entities.push(Colaborador);
+            for (const entity of this.entities) {
+                ormConfig.entities.push(entity);
+            }
 
             conn = connectionManager.create(ormConfig);
 
