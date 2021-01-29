@@ -14,11 +14,11 @@ class TypeOrmManager {
         debug('Connection request received ');
         let conn;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
-            debug('Delivering previously done connection');
+            debug('Delivering previously made connection');
             return Promise.resolve(conn);
         }
         else {
-            debug('Doing a new connection');
+            debug('Making a new connection');
             const ormConfig = Object.assign({}, config);
             ormConfig.name = name;
             for (const entity of this.entities) {

@@ -15,11 +15,11 @@ class TypeOrmManager {
 
         let conn: Connection;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
-            debug('Delivering previously done connection');
+            debug('Delivering previously made connection');
             return Promise.resolve(conn);
         }
         else {
-            debug('Doing a new connection');
+            debug('Making a new connection');
 
             const ormConfig: any = { ...config };
             ormConfig.name = name;
