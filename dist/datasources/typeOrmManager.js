@@ -32,7 +32,7 @@ class TypeOrmManager {
             }
             catch (error) {
                 debug('Connection attempt error');
-                throw error;
+                return Promise.reject(error);
             }
         }
     }
