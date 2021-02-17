@@ -100,7 +100,7 @@ abstract class Service<T> {
             if (options && options.only && options.only.indexOf(parent.name) === -1) {
                 break;
             }
-            if (options && options.ignore && options.ignore.indexOf(`${alias}${parent.alias}`) !== -1) {
+            if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                 continue;
             }
 
@@ -124,11 +124,11 @@ abstract class Service<T> {
                     parentJoinType = parent.joinType;
                 }
 
-                qb[parentJoinType](`${alias}.${parent.name}`, `${alias}${parent.alias}`, andWhereParam, andWhereParamValue, {
+                qb[parentJoinType](`${alias}.${parent.name}`, alias + parent.alias, andWhereParam, andWhereParamValue, {
                     joinType: parentJoinType
                 });
 
-                parent.service.getInstance(this.connectionName).setJoins(`${alias}${parent.alias}`, qb, {
+                parent.service.getInstance(this.connectionName).setJoins(alias + parent.alias, qb, {
                     joinType: parentJoinType,
                     subitems: parent.subitems,
                     ignore: options && options.ignore ? options.ignore : undefined,
@@ -143,7 +143,7 @@ abstract class Service<T> {
                     if (options && options.only && options.only.indexOf(child.name) === -1) {
                         break;
                     }
-                    if (options && options.ignore && options.ignore.indexOf(`${alias}${child.alias}`) !== -1) {
+                    if (options && options.ignore && options.ignore.indexOf(alias + child.alias) !== -1) {
                         continue;
                     }
 
@@ -182,10 +182,10 @@ abstract class Service<T> {
 
                         qb[childJoinType](
                             `${alias}.${child.name}`,
-                            `${alias}${child.alias}`,
+                            alias + child.alias,
                             where, andWhereParamValue);
 
-                        childService.setJoins(`${alias}${child.alias}`, qb, {
+                        childService.setJoins(alias + child.alias, qb, {
                             origin: alias,
                             joinType: child.joinType === 'leftJoin' ? child.joinType : 'leftJoinAndSelect',
                             subitems: child.subitems,
@@ -205,7 +205,7 @@ abstract class Service<T> {
 
         for (const parent of this.parentEntities) {
             if (parent.dependent) {
-                parent.service.getInstance(this.connectionName).setDefaultQuery(`${alias}${parent.alias}`, qb);
+                parent.service.getInstance(this.connectionName).setDefaultQuery(alias + parent.alias, qb);
             }
         }
     }
@@ -229,14 +229,14 @@ abstract class Service<T> {
                     if (options && options.only && options.only.indexOf(parent.name) === -1) {
                         break;
                     }
-                    if (options && options.ignore && options.ignore.indexOf(`${alias}${parent.alias}`) !== -1) {
+                    if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                         continue;
                     }
 
                     if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
                         sort = {
                             ...sort,
-                            ...parent.service.getInstance(this.connectionName).getSorting(`${alias}${parent.alias}`, {
+                            ...parent.service.getInstance(this.connectionName).getSorting(alias + parent.alias, {
                                 ignore: options ? options.ignore : undefined,
                                 only: parent.only
                             })
@@ -251,14 +251,14 @@ abstract class Service<T> {
                         if (options && options.only && options.only.indexOf(child.name) === -1) {
                             break;
                         }
-                        if (options && options.ignore && options.ignore.indexOf(`${alias}${child.alias}`) !== -1) {
+                        if (options && options.ignore && options.ignore.indexOf(alias + child.alias) !== -1) {
                             continue;
                         }
 
                         if (child.name === subitem) {
                             sort = {
                                 ...sort,
-                                ...child.service.getInstance(this.connectionName).getSorting(`${alias}${child.alias}`, {
+                                ...child.service.getInstance(this.connectionName).getSorting(alias + child.alias, {
                                     origin: alias,
                                     ignore: options && options.ignore ? options.ignore : undefined,
                                     only: child.only
@@ -317,7 +317,7 @@ abstract class Service<T> {
                 return undefined;
             }
             else {
-                return alias + '.' + compl;
+                return `${alias}.${compl}`;
             }
         }
     }

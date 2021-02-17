@@ -20,7 +20,7 @@ class Service {
             if (options && options.only && options.only.indexOf(parent.name) === -1) {
                 break;
             }
-            if (options && options.ignore && options.ignore.indexOf(`${alias}${parent.alias}`) !== -1) {
+            if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                 continue;
             }
             if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
@@ -39,10 +39,10 @@ class Service {
                 if (parentJoinType === 'innerJoinAndSelect' && parent.joinType) {
                     parentJoinType = parent.joinType;
                 }
-                qb[parentJoinType](`${alias}.${parent.name}`, `${alias}${parent.alias}`, andWhereParam, andWhereParamValue, {
+                qb[parentJoinType](`${alias}.${parent.name}`, alias + parent.alias, andWhereParam, andWhereParamValue, {
                     joinType: parentJoinType
                 });
-                parent.service.getInstance(this.connectionName).setJoins(`${alias}${parent.alias}`, qb, {
+                parent.service.getInstance(this.connectionName).setJoins(alias + parent.alias, qb, {
                     joinType: parentJoinType,
                     subitems: parent.subitems,
                     ignore: options && options.ignore ? options.ignore : undefined,
@@ -56,7 +56,7 @@ class Service {
                     if (options && options.only && options.only.indexOf(child.name) === -1) {
                         break;
                     }
-                    if (options && options.ignore && options.ignore.indexOf(`${alias}${child.alias}`) !== -1) {
+                    if (options && options.ignore && options.ignore.indexOf(alias + child.alias) !== -1) {
                         continue;
                     }
                     if (child.name === subitem) {
@@ -84,8 +84,8 @@ class Service {
                         if (andWhereParam) {
                             where += where ? `AND ${andWhereParam}` : ` ${andWhereParam} `;
                         }
-                        qb[childJoinType](`${alias}.${child.name}`, `${alias}${child.alias}`, where, andWhereParamValue);
-                        childService.setJoins(`${alias}${child.alias}`, qb, {
+                        qb[childJoinType](`${alias}.${child.name}`, alias + child.alias, where, andWhereParamValue);
+                        childService.setJoins(alias + child.alias, qb, {
                             origin: alias,
                             joinType: child.joinType === 'leftJoin' ? child.joinType : 'leftJoinAndSelect',
                             subitems: child.subitems,
@@ -103,7 +103,7 @@ class Service {
         }
         for (const parent of this.parentEntities) {
             if (parent.dependent) {
-                parent.service.getInstance(this.connectionName).setDefaultQuery(`${alias}${parent.alias}`, qb);
+                parent.service.getInstance(this.connectionName).setDefaultQuery(alias + parent.alias, qb);
             }
         }
     }
@@ -118,11 +118,11 @@ class Service {
                     if (options && options.only && options.only.indexOf(parent.name) === -1) {
                         break;
                     }
-                    if (options && options.ignore && options.ignore.indexOf(`${alias}${parent.alias}`) !== -1) {
+                    if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                         continue;
                     }
                     if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
-                        sort = Object.assign(Object.assign({}, sort), parent.service.getInstance(this.connectionName).getSorting(`${alias}${parent.alias}`, {
+                        sort = Object.assign(Object.assign({}, sort), parent.service.getInstance(this.connectionName).getSorting(alias + parent.alias, {
                             ignore: options ? options.ignore : undefined,
                             only: parent.only
                         }));
@@ -135,11 +135,11 @@ class Service {
                         if (options && options.only && options.only.indexOf(child.name) === -1) {
                             break;
                         }
-                        if (options && options.ignore && options.ignore.indexOf(`${alias}${child.alias}`) !== -1) {
+                        if (options && options.ignore && options.ignore.indexOf(alias + child.alias) !== -1) {
                             continue;
                         }
                         if (child.name === subitem) {
-                            sort = Object.assign(Object.assign({}, sort), child.service.getInstance(this.connectionName).getSorting(`${alias}${child.alias}`, {
+                            sort = Object.assign(Object.assign({}, sort), child.service.getInstance(this.connectionName).getSorting(alias + child.alias, {
                                 origin: alias,
                                 ignore: options && options.ignore ? options.ignore : undefined,
                                 only: child.only
@@ -186,7 +186,7 @@ class Service {
                 return undefined;
             }
             else {
-                return alias + '.' + compl;
+                return `${alias}.${compl}`;
             }
         }
     }
