@@ -4,7 +4,7 @@ const gulp = require('gulp');
 const clean = require('gulp-clean');
 const del = require('del');
 
-const JSON_FILES = ['./*.json', './**/*.json', '!./node_modules/**', '!./package-lock.json'];
+const JSON_FILES = ['./*.json', './**/*.json', '!./node_modules/**', '!./package-lock.json', '!./test/tsconfig.json'];
 
 gulp.task('clean', function () {
     del('./tsconfig.tsbuildinfo');

@@ -19,7 +19,7 @@
         "node_modules"
     ],
     "extension": [
-        ".ts",
+        ".ts"
     ],
     "files": [
         "src/index.d.ts"
