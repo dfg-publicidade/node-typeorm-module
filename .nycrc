@@ -11,17 +11,23 @@
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "noUnusedLocals": false
-    },
+    }, 
     "include": [
         "src/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "**/*.d.ts"
     ],
     "extension": [
         ".ts"
     ],
+    "require": [
+        "ts-node/register",
+        "source-map-support/register"
+    ],
     "files": [
         "src/index.d.ts"
-    ]
+    ],
+    "all": true
 }
