@@ -21,5 +21,8 @@
     ],
     "extension": [
         ".spec.ts"
+    ],
+    "files": [
+        "../src/index.d.ts"
     ]
 }
