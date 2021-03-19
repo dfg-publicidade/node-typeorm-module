@@ -55,7 +55,7 @@ class TypeOrmManager {
             : undefined;
     }
     static async wait(config) {
-        if (TypeOrmManager.getConnection(config.defaultName) && TypeOrmManager.getConnection(config.defaultName).isConnected) {
+        if (TypeOrmManager.getConnection(config.name) && TypeOrmManager.getConnection(config.name).isConnected) {
             await node_util_module_1.default.delay100ms();
             debug('Waiting for connection.');
             return this.wait(config);

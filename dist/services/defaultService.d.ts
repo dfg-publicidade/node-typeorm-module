@@ -92,5 +92,6 @@ declare abstract class Service<T> {
     }): any;
     translateParams(param: string, alias?: string): string;
     getRepository(): Repository<T>;
+    private queryToString;
 }
 export default Service;

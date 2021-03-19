@@ -15,7 +15,7 @@ class Service {
         this.connectionName = connectionName;
     }
     setJoins(alias, qb, options, andWhere) {
-        const joinType = options && options.joinType ? options.joinType : 'innerJoinAndSelect';
+        const joinType = options && options.joinType ? options.joinType : undefined;
         for (const parent of this.parentEntities) {
             if (options && options.only && options.only.indexOf(parent.name) === -1) {
                 break;
@@ -23,7 +23,8 @@ class Service {
             if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                 continue;
             }
-            if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
+            if (!options || !options.origin || parent.name !== options.origin && !options.origin.endsWith(parent.alias)) {
+                const parentService = parent.service.getInstance(this.connectionName);
                 let andWhereParam;
                 let andWhereParamValue;
                 if (andWhere) {
@@ -35,19 +36,26 @@ class Service {
                         }
                     }
                 }
-                let parentJoinType = joinType;
-                if (parentJoinType === 'innerJoinAndSelect' && parent.joinType) {
-                    parentJoinType = parent.joinType;
+                const parentJoinType = joinType ? joinType : 'innerJoinAndSelect';
+                const parentQb = parentService.getRepository().createQueryBuilder(alias + parent.alias);
+                if (!parent.dependent && (parentJoinType === 'leftJoin' || parentJoinType === 'leftJoinAndSelect')) {
+                    parentService.setDefaultQuery(alias + parent.alias, parentQb);
                 }
-                qb[parentJoinType](`${alias}.${parent.name}`, alias + parent.alias, andWhereParam, andWhereParamValue, {
-                    joinType: parentJoinType
-                });
-                parent.service.getInstance(this.connectionName).setJoins(alias + parent.alias, qb, {
+                if (andWhereParam) {
+                    parentQb.andWhere(andWhereParam);
+                }
+                const query = this.queryToString(parentQb, andWhereParamValue);
+                qb[parentJoinType](`${alias}.${parent.name}`, alias + parent.alias, query === null || query === void 0 ? void 0 : query.where, query === null || query === void 0 ? void 0 : query.params);
+                parentService.setJoins(alias + parent.alias, qb, {
+                    origin: alias,
                     joinType: parentJoinType,
                     subitems: parent.subitems,
                     ignore: options && options.ignore ? options.ignore : undefined,
                     only: parent.only
                 }, andWhere);
+                if (parent.dependent && (parentJoinType === 'innerJoin' || parentJoinType === 'innerJoinAndSelect')) {
+                    parentService.setDefaultQuery(alias + parent.alias, qb);
+                }
             }
         }
         if (options && options.subitems) {
@@ -60,9 +68,16 @@ class Service {
                         continue;
                     }
                     if (child.name === subitem) {
-                        const childJoinType = joinType && (joinType === 'leftJoin' || joinType === 'leftJoinAndSelect') ? joinType :
+                        const childJoinType = joinType && (joinType === 'innerJoin' || joinType === 'innerJoinAndSelect') ? joinType :
                             child.joinType ? child.joinType : 'leftJoinAndSelect';
                         const childService = child.service.getInstance(this.connectionName);
+                        const childQb = childService.getRepository().createQueryBuilder(alias + child.alias);
+                        if (childJoinType === 'leftJoin' || childJoinType === 'leftJoinAndSelect') {
+                            childService.setDefaultQuery(alias + child.alias, childQb);
+                        }
+                        if (child.andWhere) {
+                            childQb.andWhere(child.andWhere);
+                        }
                         let andWhereParam;
                         let andWhereParamValue;
                         if (andWhere) {
@@ -74,20 +89,14 @@ class Service {
                                 }
                             }
                         }
-                        let where = '';
-                        if (childService.deletedAtField) {
-                            where = `${alias}${child.alias}.${childService.deletedAtField} IS NULL `;
-                        }
-                        if (child.andWhere) {
-                            where += where ? `AND ${child.andWhere} ` : ` ${child.andWhere} `;
-                        }
                         if (andWhereParam) {
-                            where += where ? `AND ${andWhereParam}` : ` ${andWhereParam} `;
+                            childQb.andWhere(andWhereParam);
                         }
-                        qb[childJoinType](`${alias}.${child.name}`, alias + child.alias, where, andWhereParamValue);
+                        const query = this.queryToString(childQb, andWhereParamValue);
+                        qb[childJoinType](`${alias}.${child.name}`, alias + child.alias, query === null || query === void 0 ? void 0 : query.where, query === null || query === void 0 ? void 0 : query.params);
                         childService.setJoins(alias + child.alias, qb, {
                             origin: alias,
-                            joinType: child.joinType === 'leftJoin' ? child.joinType : 'leftJoinAndSelect',
+                            joinType: childJoinType,
                             subitems: child.subitems,
                             ignore: options && options.ignore ? options.ignore : undefined,
                             only: child.only
@@ -101,33 +110,26 @@ class Service {
         if (this.deletedAtField) {
             qb.andWhere(`${alias}.${this.deletedAtField} IS NULL`);
         }
-        for (const parent of this.parentEntities) {
-            if (parent.dependent) {
-                parent.service.getInstance(this.connectionName).setDefaultQuery(alias + parent.alias, qb);
-            }
-        }
     }
     getSorting(alias, options) {
         let sort = {};
         if (!options || !options.sort || Object.keys(options.sort).length === 0) {
-            for (const key of Object.keys(this.defaultSorting)) {
-                sort[key.replace('$alias', alias)] = this.defaultSorting[key];
-            }
             for (const parent of this.parentEntities) {
                 if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
                     if (options && options.only && options.only.indexOf(parent.name) === -1) {
-                        break;
+                        continue;
                     }
                     if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
                         continue;
                     }
-                    if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
-                        sort = Object.assign(Object.assign({}, sort), parent.service.getInstance(this.connectionName).getSorting(alias + parent.alias, {
-                            ignore: options ? options.ignore : undefined,
-                            only: parent.only
-                        }));
-                    }
+                    sort = Object.assign(Object.assign({}, sort), parent.service.getInstance(this.connectionName).getSorting(alias + parent.alias, {
+                        ignore: options === null || options === void 0 ? void 0 : options.ignore,
+                        only: parent.only
+                    }));
                 }
+            }
+            for (const key of Object.keys(this.defaultSorting)) {
+                sort[key.replace('$alias', alias)] = this.defaultSorting[key];
             }
             if (options && options.subitems) {
                 for (const subitem of options.subitems) {
@@ -200,6 +202,29 @@ class Service {
         }
         else {
             return repository;
+        }
+    }
+    queryToString(qb, andWhereParamValue) {
+        let where = qb.getQuery();
+        if (where.indexOf('WHERE') === -1) {
+            return undefined;
+        }
+        else {
+            let end = where.indexOf('ORDER BY');
+            if (end === -1) {
+                end = where.indexOf('GROUP BY');
+            }
+            if (end === -1) {
+                end = where.indexOf('LIMIT BY');
+            }
+            if (end === -1) {
+                end = where.length;
+            }
+            where = where.substring(where.indexOf('WHERE') + 'WHERE'.length, end).trim();
+            return {
+                where,
+                params: andWhereParamValue
+            };
         }
     }
 }

@@ -66,7 +66,7 @@ class TypeOrmManager {
     }
 
     public static async wait(config: any): Promise<void> {
-        if (TypeOrmManager.getConnection(config.defaultName) && TypeOrmManager.getConnection(config.defaultName).isConnected) {
+        if (TypeOrmManager.getConnection(config.name) && TypeOrmManager.getConnection(config.name).isConnected) {
             await Util.delay100ms();
             debug('Waiting for connection.');
             return this.wait(config);
