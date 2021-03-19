@@ -1,3 +1,4 @@
+import Strings from '@dfgpublicidade/node-strings-module';
 import { Connection, ObjectType, Repository, SelectQueryBuilder } from 'typeorm';
 import { DefaultService } from '..';
 import TypeOrmManager from '../datasources/typeOrmManager';
@@ -133,7 +134,7 @@ abstract class Service<T> {
                     parentQb.andWhere(andWhereParam);
                 }
 
-                const query: any = this.queryToString(parentQb, andWhereParamValue);
+                const query: any = this.queryToString(alias + parent.alias, alias, parentQb, andWhereParamValue);
 
                 qb[parentJoinType](
                     `${alias}.${parent.name}`,
@@ -199,7 +200,7 @@ abstract class Service<T> {
                             childQb.andWhere(andWhereParam);
                         }
 
-                        const query: any = this.queryToString(childQb, andWhereParamValue);
+                        const query: any = this.queryToString(alias + child.alias, alias, childQb, andWhereParamValue);
 
                         qb[childJoinType](
                             `${alias}.${child.name}`,
@@ -351,7 +352,7 @@ abstract class Service<T> {
         }
     }
 
-    private queryToString(qb: SelectQueryBuilder<any>, andWhereParamValue: any): {
+    private queryToString(refAlias: string, alias: string, qb: SelectQueryBuilder<any>, andWhereParamValue: any): {
         where: string;
         params: any;
     } {
@@ -376,10 +377,14 @@ abstract class Service<T> {
             }
 
             where = where.substring(where.indexOf('WHERE') + 'WHERE'.length, end).trim();
+            where = where.replace(`${refAlias}${Strings.firstCharToUpper(alias)}`, alias);
 
             return {
                 where,
-                params: andWhereParamValue
+                params: {
+                    ...qb.getParameters(),
+                    ...andWhereParamValue
+                }
             };
         }
     }
