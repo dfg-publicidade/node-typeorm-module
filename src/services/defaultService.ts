@@ -170,7 +170,7 @@ abstract class Service<T> {
                     }
 
                     if (child.name === subitem) {
-                        let childJoinType: JoinType  = child.joinType ? child.joinType : 'leftJoinAndSelect';
+                        let childJoinType: JoinType = child.joinType ? child.joinType : 'leftJoinAndSelect';
 
                         if ((childJoinType === 'leftJoin' || childJoinType === 'leftJoinAndSelect') && options.joinType) {
                             childJoinType = options.joinType;
@@ -216,7 +216,7 @@ abstract class Service<T> {
 
                         childService.setJoins(alias + child.alias, qb, {
                             origin: alias,
-                            joinType: childJoinType,
+                            joinType: childJoinType === 'leftJoin' || childJoinType === 'leftJoinAndSelect' ? childJoinType : 'leftJoinAndSelect',
                             subitems: child.subitems,
                             ignore: options && options.ignore ? options.ignore : undefined,
                             only: child.only
