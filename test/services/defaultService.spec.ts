@@ -140,7 +140,8 @@ class TestService2 extends DefaultService<Test2> {
         }, {
             name: 'testB',
             alias: 'TestB',
-            service: TestService
+            service: TestService,
+            joinType: 'innerJoinAndSelect'
         }];
 
         this.childEntities = [];
