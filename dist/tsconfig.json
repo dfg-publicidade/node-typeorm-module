@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "commonjs",
+        "rootDir": "./src",
+        "outDir": "dist",
+        "composite": true,
+        "incremental": true,
+        "declaration": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "noUnusedLocals": false
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "extension": [
+        ".ts"
+    ],
+    "files": [
+        "src/index.d.ts"
+    ]
+}
