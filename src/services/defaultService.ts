@@ -109,7 +109,7 @@ abstract class Service<T> {
 
                 let parentJoinType: JoinType = parent.joinType ? parent.joinType : 'innerJoinAndSelect';
 
-                if ((parentJoinType === 'innerJoin' || parentJoinType === 'innerJoinAndSelect') && options.joinType) {
+                if ((parentJoinType === 'innerJoin' || parentJoinType === 'innerJoinAndSelect') && options?.joinType) {
                     parentJoinType = options.joinType;
                 }
 

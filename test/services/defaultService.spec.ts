@@ -1179,4 +1179,39 @@ describe('DefaultService', (): void => {
 
         testService2.setDependent(false);
     });
+
+    it('43. setJoins', async (): Promise<void> => {
+        const test2: string = 'test2';
+        const test: string = `${test2}Test`;
+        const testB: string = `${test2}TestB`;
+
+        const qb: SelectQueryBuilder<Test2> = testService2.getRepository().createQueryBuilder(test2);
+
+        testService2.setJoins(test2, qb);
+
+        expect(qb.getSql().replace(/\s+/ig, ' ')).to.be.eq(`
+            SELECT
+            '${test2}'.'id'         AS '${test2}_id', 
+            '${test2}'.'deleted_at' AS '${test2}_deleted_at', 
+            '${test2}'.'test'       AS '${test2}_test', 
+            '${test2}'.'testB'      AS '${test2}_testB', 
+            
+            '${test}'.'id'         AS '${test}_id', 
+            '${test}'.'name'       AS '${test}_name', 
+            '${test}'.'created_at' AS '${test}_created_at', 
+            '${test}'.'updated_at' AS '${test}_updated_at', 
+            '${test}'.'deleted_at' AS '${test}_deleted_at', 
+
+            '${testB}'.'id'         AS '${testB}_id', 
+            '${testB}'.'name'       AS '${testB}_name', 
+            '${testB}'.'created_at' AS '${testB}_created_at', 
+            '${testB}'.'updated_at' AS '${testB}_updated_at', 
+            '${testB}'.'deleted_at' AS '${testB}_deleted_at' 
+
+            FROM 'Test2' '${test2}'
+            INNER JOIN 'Test' '${test}'  ON '${test}'.'id'='${test2}'.'test' 
+            INNER JOIN 'Test' '${testB}' ON '${testB}'.'id'='${test2}'.'testB'
+        `.replace(/[\r|\n|\t]/ig, '').replace(/\s+/ig, ' ').replace(/'/ig, '`').trim());
+        expect(await qb.getCount()).to.be.eq(1);
+    });
 });

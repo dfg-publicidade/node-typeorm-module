@@ -26,7 +26,7 @@ class Service {
             if (!options || !options.origin || parent.name !== options.origin && !options.origin.endsWith(parent.alias)) {
                 const parentService = parent.service.getInstance(this.connectionName);
                 let parentJoinType = parent.joinType ? parent.joinType : 'innerJoinAndSelect';
-                if ((parentJoinType === 'innerJoin' || parentJoinType === 'innerJoinAndSelect') && options.joinType) {
+                if ((parentJoinType === 'innerJoin' || parentJoinType === 'innerJoinAndSelect') && (options === null || options === void 0 ? void 0 : options.joinType)) {
                     parentJoinType = options.joinType;
                 }
                 let andWhereParam;
