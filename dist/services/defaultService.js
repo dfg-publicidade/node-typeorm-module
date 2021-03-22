@@ -51,6 +51,7 @@ class Service {
                 qb[parentJoinType](`${alias}.${parent.name}`, alias + parent.alias, query === null || query === void 0 ? void 0 : query.where, query === null || query === void 0 ? void 0 : query.params);
                 parentService.setJoins(alias + parent.alias, qb, {
                     origin: alias,
+                    joinType: parentJoinType,
                     subitems: parent.subitems,
                     ignore: options && options.ignore ? options.ignore : undefined,
                     only: parent.only
