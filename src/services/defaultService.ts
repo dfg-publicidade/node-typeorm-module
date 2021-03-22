@@ -147,6 +147,7 @@ abstract class Service<T> {
 
                 parentService.setJoins(alias + parent.alias, qb, {
                     origin: alias,
+                    joinType: parentJoinType,
                     subitems: parent.subitems,
                     ignore: options && options.ignore ? options.ignore : undefined,
                     only: parent.only
