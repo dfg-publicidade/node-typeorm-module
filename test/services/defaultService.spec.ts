@@ -384,18 +384,13 @@ describe('DefaultService', (): void => {
     });
 
     it('16. getSorting', async (): Promise<void> => {
-        expect(testService2.getSorting('test2', {})).to.be.deep.eq({
-            'test2Test.name': 'ASC',
-            'test2TestB.name': 'ASC'
-        });
+        expect(testService2.getSorting('test2', {})).to.be.deep.eq({});
     });
 
     it('17. getSorting', async (): Promise<void> => {
         expect(testService2.getSorting('test2', {
             ignore: ['test2Test']
-        })).to.be.deep.eq({
-            'test2TestB.name': 'ASC'
-        });
+        })).to.be.deep.eq({});
     });
 
     it('18. getSorting', async (): Promise<void> => {
@@ -407,8 +402,7 @@ describe('DefaultService', (): void => {
             subitems: ['tests', 'others']
         })).to.be.deep.eq({
             'test.name': 'ASC',
-            'testTest2.title': 'ASC',
-            'testTest2TestB.name': 'ASC'
+            'testTest2.title': 'ASC'
         });
 
         testService2.setDefaultSorting({});
@@ -424,8 +418,7 @@ describe('DefaultService', (): void => {
             ignore: ['others']
         })).to.be.deep.eq({
             'test.name': 'ASC',
-            'testTest2.title': 'ASC',
-            'testTest2TestB.name': 'ASC'
+            'testTest2.title': 'ASC'
         });
 
         testService2.setDefaultSorting({});
@@ -439,7 +432,6 @@ describe('DefaultService', (): void => {
         expect(testService2.getSorting('test2', {
             only: ['testB']
         })).to.be.deep.eq({
-            'test2TestB.name': 'ASC',
             'test2.title': 'ASC'
         });
 
@@ -465,10 +457,7 @@ describe('DefaultService', (): void => {
     });
 
     it('23. getSorting', async (): Promise<void> => {
-        expect(testService2.getSorting('test2')).to.be.deep.eq({
-            'test2Test.name': 'ASC',
-            'test2TestB.name': 'ASC'
-        });
+        expect(testService2.getSorting('test2')).to.be.deep.eq({});
     });
 
     it('24. setJoins', async (): Promise<void> => {

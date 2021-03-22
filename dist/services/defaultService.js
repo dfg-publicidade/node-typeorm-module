@@ -119,20 +119,6 @@ class Service {
     getSorting(alias, options) {
         let sort = {};
         if (!options || !options.sort || Object.keys(options.sort).length === 0) {
-            for (const parent of this.parentEntities) {
-                if (!options || !options.origin || parent.name !== options.origin && !parent.alias.endsWith(options.origin)) {
-                    if (options && options.only && options.only.indexOf(parent.name) === -1) {
-                        continue;
-                    }
-                    if (options && options.ignore && options.ignore.indexOf(alias + parent.alias) !== -1) {
-                        continue;
-                    }
-                    sort = Object.assign(Object.assign({}, sort), parent.service.getInstance(this.connectionName).getSorting(alias + parent.alias, {
-                        ignore: options === null || options === void 0 ? void 0 : options.ignore,
-                        only: parent.only
-                    }));
-                }
-            }
             for (const key of Object.keys(this.defaultSorting)) {
                 sort[key.replace('$alias', alias)] = this.defaultSorting[key];
             }
