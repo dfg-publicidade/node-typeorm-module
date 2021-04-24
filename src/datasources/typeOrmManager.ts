@@ -74,7 +74,7 @@ class TypeOrmManager {
         if (!name) {
             throw new Error('Connection name was not provided.');
         }
-        
+
         return connectionManager.has(name)
             ? connectionManager.get(name)
             : undefined;

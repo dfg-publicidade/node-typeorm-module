@@ -1,6 +1,7 @@
+import { Service as ParamService } from '@dfgpublicidade/node-params-module';
 import { ObjectType, Repository } from 'typeorm';
 import JoinType from '../enums/joinType';
-declare abstract class Service<T> {
+declare abstract class Service<T> implements ParamService {
     deletedAtField: string;
     protected defaultSorting: any;
     protected parentEntities: {
@@ -75,6 +76,8 @@ declare abstract class Service<T> {
     private repositoryType;
     private connectionName;
     protected constructor(repositoryType: ObjectType<T>, connectionName: string);
+    getRepository(): Repository<T>;
+    translateParams(param: string, alias?: string): string;
     setJoins(alias: string, qb: any, options?: {
         origin?: string;
         joinType?: JoinType;
@@ -90,8 +93,6 @@ declare abstract class Service<T> {
         ignore?: string[];
         only?: string[];
     }): any;
-    translateParams(param: string, alias?: string): string;
-    getRepository(): Repository<T>;
     private queryToString;
 }
 export default Service;

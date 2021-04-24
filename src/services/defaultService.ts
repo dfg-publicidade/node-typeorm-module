@@ -87,10 +87,10 @@ abstract class Service<T> implements ParamService {
 
     protected constructor(repositoryType: ObjectType<T>, connectionName: string) {
         if (!repositoryType) {
-            throw new Error('Repository type was not provided.')
+            throw new Error('Repository type was not provided.');
         }
         if (!connectionName) {
-            throw new Error('Connection name was not provided.')
+            throw new Error('Connection name was not provided.');
         }
 
         this.repositoryType = repositoryType;
@@ -159,10 +159,10 @@ abstract class Service<T> implements ParamService {
         only?: string[];
     }, andWhere?: any): void {
         if (!alias) {
-            throw new Error('Alias was not provided.')
+            throw new Error('Alias was not provided.');
         }
         if (!qb) {
-            throw new Error('Query builder was not provided.')
+            throw new Error('Query builder was not provided.');
         }
 
         for (const parent of this.parentEntities) {
@@ -298,12 +298,12 @@ abstract class Service<T> implements ParamService {
 
     public setDefaultQuery(alias: string, qb: any): void {
         if (!alias) {
-            throw new Error('Alias was not provided.')
+            throw new Error('Alias was not provided.');
         }
         if (!qb) {
-            throw new Error('Query builder was not provided.')
+            throw new Error('Query builder was not provided.');
         }
-        
+
         if (this.deletedAtField) {
             qb.andWhere(`${alias}.${this.deletedAtField} IS NULL`);
         }
@@ -317,7 +317,7 @@ abstract class Service<T> implements ParamService {
         only?: string[];
     }): any {
         if (!alias) {
-            throw new Error('Alias was not provided.')
+            throw new Error('Alias was not provided.');
         }
 
         let sort: any = {};

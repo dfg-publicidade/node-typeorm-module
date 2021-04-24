@@ -12,6 +12,12 @@ const connectionManager = typeorm_1.getConnectionManager();
 class TypeOrmManager {
     static async connect(config, name) {
         debug('Connection request received ');
+        if (!config) {
+            throw new Error('Connection config. was not provided.');
+        }
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
         let conn;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
             debug('Delivering previously made connection');
@@ -30,7 +36,7 @@ class TypeOrmManager {
                 debug('Connection done');
                 return Promise.resolve(conn);
             }
-            catch (error: any) {
+            catch (error) {
                 debug('Connection attempt error');
                 return Promise.reject(error);
             }
@@ -38,23 +44,32 @@ class TypeOrmManager {
     }
     static async close(name) {
         debug('Closing connection');
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
         try {
             if (connectionManager.get(name).isConnected) {
                 await connectionManager.get(name).close();
                 debug('Connection closed');
             }
         }
-        catch (error: any) {
+        catch (error) {
             debug('Connection close attempt error');
             throw error;
         }
     }
     static getConnection(name) {
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
         return connectionManager.has(name)
             ? connectionManager.get(name)
             : undefined;
     }
     static async wait(config) {
+        if (!config) {
+            throw new Error('Config. was not provided.');
+        }
         if (TypeOrmManager.getConnection(config.name) && TypeOrmManager.getConnection(config.name).isConnected) {
             await node_util_module_1.default.delay100ms();
             debug('Waiting for connection.');

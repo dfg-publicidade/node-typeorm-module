@@ -12,10 +12,66 @@ class Service {
         this.defaultSorting = {};
         this.parentEntities = [];
         this.childEntities = [];
+        if (!repositoryType) {
+            throw new Error('Repository type was not provided.');
+        }
+        if (!connectionName) {
+            throw new Error('Connection name was not provided.');
+        }
         this.repositoryType = repositoryType;
         this.connectionName = connectionName;
     }
+    getRepository() {
+        const connection = typeOrmManager_1.default.getConnection(this.connectionName);
+        const repository = connection && connection.isConnected
+            ? connection.getRepository(this.repositoryType)
+            : undefined;
+        if (!connection || !connection.isConnected || !repository) {
+            throw new Error('Connection or repository not found.');
+        }
+        else {
+            return repository;
+        }
+    }
+    translateParams(param, alias) {
+        if (!param) {
+            return '';
+        }
+        else if (param.indexOf('.') === -1) {
+            return param;
+        }
+        else {
+            const field = param.substring(0, param.indexOf('.'));
+            const compl = param.substring(param.indexOf('.') + 1);
+            alias = alias ? alias : field;
+            if (compl.indexOf('.') !== -1) {
+                const subfield = compl.substring(0, compl.indexOf('.'));
+                for (const parent of this.parentEntities) {
+                    if (parent.name === subfield) {
+                        const result = parent.service.getInstance(this.connectionName).translateParams(compl, parent.alias);
+                        return result ? alias + result : undefined;
+                    }
+                }
+                for (const child of this.childEntities) {
+                    if (child.name === subfield) {
+                        const result = child.service.getInstance(this.connectionName).translateParams(compl, child.alias);
+                        return result ? alias + result : undefined;
+                    }
+                }
+                return undefined;
+            }
+            else {
+                return `${alias}.${compl}`;
+            }
+        }
+    }
     setJoins(alias, qb, options, andWhere) {
+        if (!alias) {
+            throw new Error('Alias was not provided.');
+        }
+        if (!qb) {
+            throw new Error('Query builder was not provided.');
+        }
         for (const parent of this.parentEntities) {
             if (options && options.only && options.only.indexOf(parent.name) === -1) {
                 break;
@@ -112,11 +168,20 @@ class Service {
         }
     }
     setDefaultQuery(alias, qb) {
+        if (!alias) {
+            throw new Error('Alias was not provided.');
+        }
+        if (!qb) {
+            throw new Error('Query builder was not provided.');
+        }
         if (this.deletedAtField) {
             qb.andWhere(`${alias}.${this.deletedAtField} IS NULL`);
         }
     }
     getSorting(alias, options) {
+        if (!alias) {
+            throw new Error('Alias was not provided.');
+        }
         let sort = {};
         if (!options || !options.sort || Object.keys(options.sort).length === 0) {
             for (const key of Object.keys(this.defaultSorting)) {
@@ -150,50 +215,6 @@ class Service {
             sort = parsedSort;
         }
         return sort;
-    }
-    translateParams(param, alias) {
-        if (!param) {
-            return '';
-        }
-        else if (param.indexOf('.') === -1) {
-            return param;
-        }
-        else {
-            const field = param.substring(0, param.indexOf('.'));
-            const compl = param.substring(param.indexOf('.') + 1);
-            alias = alias ? alias : field;
-            if (compl.indexOf('.') !== -1) {
-                const subfield = compl.substring(0, compl.indexOf('.'));
-                for (const parent of this.parentEntities) {
-                    if (parent.name === subfield) {
-                        const result = parent.service.getInstance(this.connectionName).translateParams(compl, parent.alias);
-                        return result ? alias + result : undefined;
-                    }
-                }
-                for (const child of this.childEntities) {
-                    if (child.name === subfield) {
-                        const result = child.service.getInstance(this.connectionName).translateParams(compl, child.alias);
-                        return result ? alias + result : undefined;
-                    }
-                }
-                return undefined;
-            }
-            else {
-                return `${alias}.${compl}`;
-            }
-        }
-    }
-    getRepository() {
-        const connection = typeOrmManager_1.default.getConnection(this.connectionName);
-        const repository = connection && connection.isConnected
-            ? connection.getRepository(this.repositoryType)
-            : undefined;
-        if (!connection || !connection.isConnected || !repository) {
-            throw new Error('Connection or repository not found.');
-        }
-        else {
-            return repository;
-        }
     }
     queryToString(refAlias, alias, qb, andWhereParamValue) {
         let where = qb.getQuery();
