@@ -1,3 +1,4 @@
+import { Service as ParamService } from '@dfgpublicidade/node-params-module';
 import Strings from '@dfgpublicidade/node-strings-module';
 import { Connection, ObjectType, Repository, SelectQueryBuilder } from 'typeorm';
 import { DefaultService } from '..';
@@ -5,7 +6,7 @@ import TypeOrmManager from '../datasources/typeOrmManager';
 import JoinType from '../enums/joinType';
 
 /* Module */
-abstract class Service<T> {
+abstract class Service<T> implements ParamService {
     public deletedAtField: string = 'deleted_at';
 
     protected defaultSorting: any = {};
@@ -85,8 +86,69 @@ abstract class Service<T> {
     private connectionName: string;
 
     protected constructor(repositoryType: ObjectType<T>, connectionName: string) {
+        if (!repositoryType) {
+            throw new Error('Repository type was not provided.')
+        }
+        if (!connectionName) {
+            throw new Error('Connection name was not provided.')
+        }
+
         this.repositoryType = repositoryType;
         this.connectionName = connectionName;
+    }
+
+    public getRepository(): Repository<T> {
+        const connection: Connection = TypeOrmManager.getConnection(this.connectionName);
+        const repository: Repository<T> = connection && connection.isConnected
+            ? connection.getRepository(this.repositoryType)
+            : undefined;
+
+        if (!connection || !connection.isConnected || !repository) {
+            throw new Error('Connection or repository not found.');
+        }
+        else {
+            return repository;
+        }
+    }
+
+    public translateParams(param: string, alias?: string): string {
+        if (!param) {
+            return '';
+        }
+        else if (param.indexOf('.') === -1) {
+            return param;
+        }
+        else {
+            const field: string = param.substring(0, param.indexOf('.'));
+            const compl: string = param.substring(param.indexOf('.') + 1);
+
+            alias = alias ? alias : field;
+
+            if (compl.indexOf('.') !== -1) {
+                const subfield: string = compl.substring(0, compl.indexOf('.'));
+
+                for (const parent of this.parentEntities) {
+                    if (parent.name === subfield) {
+                        const result: string = parent.service.getInstance(this.connectionName).translateParams(compl, parent.alias);
+
+                        return result ? alias + result : undefined;
+                    }
+                }
+
+                for (const child of this.childEntities) {
+                    if (child.name === subfield) {
+                        const result: string = child.service.getInstance(this.connectionName).translateParams(compl, child.alias);
+
+                        return result ? alias + result : undefined;
+                    }
+                }
+
+                return undefined;
+            }
+            else {
+                return `${alias}.${compl}`;
+            }
+        }
     }
 
     public setJoins(alias: string, qb: any, options?: {
@@ -96,6 +158,13 @@ abstract class Service<T> {
         ignore?: string[];
         only?: string[];
     }, andWhere?: any): void {
+        if (!alias) {
+            throw new Error('Alias was not provided.')
+        }
+        if (!qb) {
+            throw new Error('Query builder was not provided.')
+        }
+
         for (const parent of this.parentEntities) {
             if (options && options.only && options.only.indexOf(parent.name) === -1) {
                 break;
@@ -228,6 +297,13 @@ abstract class Service<T> {
     }
 
     public setDefaultQuery(alias: string, qb: any): void {
+        if (!alias) {
+            throw new Error('Alias was not provided.')
+        }
+        if (!qb) {
+            throw new Error('Query builder was not provided.')
+        }
+        
         if (this.deletedAtField) {
             qb.andWhere(`${alias}.${this.deletedAtField} IS NULL`);
         }
@@ -240,6 +316,10 @@ abstract class Service<T> {
         ignore?: string[];
         only?: string[];
     }): any {
+        if (!alias) {
+            throw new Error('Alias was not provided.')
+        }
+
         let sort: any = {};
 
         if (!options || !options.sort || Object.keys(options.sort).length === 0) {
@@ -282,60 +362,6 @@ abstract class Service<T> {
         }
 
         return sort;
-    }
-
-    public translateParams(param: string, alias?: string): string {
-        if (!param) {
-            return '';
-        }
-        else if (param.indexOf('.') === -1) {
-            return param;
-        }
-        else {
-            const field: string = param.substring(0, param.indexOf('.'));
-            const compl: string = param.substring(param.indexOf('.') + 1);
-
-            alias = alias ? alias : field;
-
-            if (compl.indexOf('.') !== -1) {
-                const subfield: string = compl.substring(0, compl.indexOf('.'));
-
-                for (const parent of this.parentEntities) {
-                    if (parent.name === subfield) {
-                        const result: string = parent.service.getInstance(this.connectionName).translateParams(compl, parent.alias);
-
-                        return result ? alias + result : undefined;
-                    }
-                }
-
-                for (const child of this.childEntities) {
-                    if (child.name === subfield) {
-                        const result: string = child.service.getInstance(this.connectionName).translateParams(compl, child.alias);
-
-                        return result ? alias + result : undefined;
-                    }
-                }
-
-                return undefined;
-            }
-            else {
-                return `${alias}.${compl}`;
-            }
-        }
-    }
-
-    public getRepository(): Repository<T> {
-        const connection: Connection = TypeOrmManager.getConnection(this.connectionName);
-        const repository: Repository<T> = connection && connection.isConnected
-            ? connection.getRepository(this.repositoryType)
-            : undefined;
-
-        if (!connection || !connection.isConnected || !repository) {
-            throw new Error('Connection or repository not found');
-        }
-        else {
-            return repository;
-        }
     }
 
     private queryToString(refAlias: string, alias: string, qb: SelectQueryBuilder<any>, andWhereParamValue: any): {

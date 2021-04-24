@@ -189,7 +189,7 @@ class Service {
             ? connection.getRepository(this.repositoryType)
             : undefined;
         if (!connection || !connection.isConnected || !repository) {
-            throw new Error('Connection or repository not found');
+            throw new Error('Connection or repository not found.');
         }
         else {
             return repository;

@@ -13,6 +13,13 @@ class TypeOrmManager {
     public static async connect(config: any, name: string): Promise<Connection> {
         debug('Connection request received ');
 
+        if (!config) {
+            throw new Error('Connection config. was not provided.');
+        }
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
+
         let conn: Connection;
         if (connectionManager.has(name) && (conn = connectionManager.get(name)).isConnected) {
             debug('Delivering previously made connection');
@@ -37,7 +44,7 @@ class TypeOrmManager {
 
                 return Promise.resolve(conn);
             }
-            catch (error) {
+            catch (error: any) {
                 debug('Connection attempt error');
                 return Promise.reject(error);
             }
@@ -47,25 +54,37 @@ class TypeOrmManager {
     public static async close(name: string): Promise<void> {
         debug('Closing connection');
 
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
+
         try {
             if (connectionManager.get(name).isConnected) {
                 await connectionManager.get(name).close();
                 debug('Connection closed');
             }
         }
-        catch (error) {
+        catch (error: any) {
             debug('Connection close attempt error');
             throw error;
         }
     }
 
     public static getConnection(name: string): Connection {
+        if (!name) {
+            throw new Error('Connection name was not provided.');
+        }
+        
         return connectionManager.has(name)
             ? connectionManager.get(name)
             : undefined;
     }
 
     public static async wait(config: any): Promise<void> {
+        if (!config) {
+            throw new Error('Config. was not provided.');
+        }
+
         if (TypeOrmManager.getConnection(config.name) && TypeOrmManager.getConnection(config.name).isConnected) {
             await Util.delay100ms();
             debug('Waiting for connection.');

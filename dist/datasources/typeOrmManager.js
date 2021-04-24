@@ -30,7 +30,7 @@ class TypeOrmManager {
                 debug('Connection done');
                 return Promise.resolve(conn);
             }
-            catch (error) {
+            catch (error: any) {
                 debug('Connection attempt error');
                 return Promise.reject(error);
             }
@@ -44,7 +44,7 @@ class TypeOrmManager {
                 debug('Connection closed');
             }
         }
-        catch (error) {
+        catch (error: any) {
             debug('Connection close attempt error');
             throw error;
         }
