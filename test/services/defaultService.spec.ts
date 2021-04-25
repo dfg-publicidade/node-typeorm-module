@@ -366,7 +366,7 @@ describe('DefaultService', (): void => {
     });
 
     it('6. translateParams', async (): Promise<void> => {
-        expect(testService.translateParams(undefined)).to.be.empty;
+        expect(testService.translateParams(undefined)).to.be.undefined;
     });
 
     it('7. translateParams', async (): Promise<void> => {
