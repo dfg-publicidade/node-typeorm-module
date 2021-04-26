@@ -327,13 +327,13 @@ describe('DefaultService', (): void => {
     });
 
     it('1. constructor', async (): Promise<void> => {
-        expect(() => {
+        expect((): void => {
             TestServiceFail.getInstance(undefined);
         }).to.throw('Repository type was not provided.');
     });
 
     it('2. constructor', async (): Promise<void> => {
-        expect(() => {
+        expect((): void => {
             TestService.getInstance(undefined);
         }).to.throw('Connection name was not provided.');
     });
@@ -366,7 +366,7 @@ describe('DefaultService', (): void => {
     });
 
     it('6. translateParams', async (): Promise<void> => {
-        expect(testService.translateParams(undefined)).to.be.undefined;
+        expect(testService.translateParams(undefined)).to.be.eq('');
     });
 
     it('7. translateParams', async (): Promise<void> => {
@@ -402,7 +402,7 @@ describe('DefaultService', (): void => {
 
         const qb: SelectQueryBuilder<Test> = testService.getRepository().createQueryBuilder(test);
 
-        expect(() => {
+        expect((): void => {
             testService.setDefaultQuery(undefined, qb);
         }).to.throw('Alias was not provided.');
     });
@@ -410,9 +410,7 @@ describe('DefaultService', (): void => {
     it('15. setDefaultQuery', async (): Promise<void> => {
         const test: string = 'test';
 
-        const qb: SelectQueryBuilder<Test> = testService.getRepository().createQueryBuilder(test);
-
-        expect(() => {
+        expect((): void => {
             testService.setDefaultQuery(test, undefined);
         }).to.throw('Query builder was not provided.');
     });
@@ -458,8 +456,8 @@ describe('DefaultService', (): void => {
     });
 
     it('18. getSorting', async (): Promise<void> => {
-        expect(() => {
-            testService.getSorting(undefined, {})
+        expect((): void => {
+            testService.getSorting(undefined, {});
         }).to.throw('Alias was not provided.');
     });
 
@@ -561,7 +559,7 @@ describe('DefaultService', (): void => {
 
         const qb: SelectQueryBuilder<Test> = testService.getRepository().createQueryBuilder(test);
 
-        expect(() => {
+        expect((): void => {
             testService.setJoins(undefined, qb, {});
         }).to.throw('Alias was not provided.');
     });
@@ -569,9 +567,7 @@ describe('DefaultService', (): void => {
     it('30. setJoins', async (): Promise<void> => {
         const test: string = 'test';
 
-        const qb: SelectQueryBuilder<Test> = testService.getRepository().createQueryBuilder(test);
-
-        expect(() => {
+        expect((): void => {
             testService.setJoins(test, undefined, {});
         }).to.throw('Query builder was not provided.');
     });

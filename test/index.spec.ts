@@ -63,7 +63,7 @@ describe('TypeOrmManager', (): void => {
     });
 
     it('1. connect', async (): Promise<void> => {
-        let connectionError;
+        let connectionError: any;
         try {
             await TypeOrmManagerTest.connect(undefined, options.name);
         }
@@ -76,7 +76,7 @@ describe('TypeOrmManager', (): void => {
     });
 
     it('2. connect', async (): Promise<void> => {
-        let connectionError;
+        let connectionError: any;
         try {
             await TypeOrmManagerTest.connect(options, undefined);
         }
@@ -120,7 +120,7 @@ describe('TypeOrmManager', (): void => {
     });
 
     it('6. getConnection', async (): Promise<void> => {
-        expect(() => {
+        expect((): void => {
             TypeOrmManagerTest.getConnection(undefined);
         }).to.throw('Connection name was not provided.');
     });
