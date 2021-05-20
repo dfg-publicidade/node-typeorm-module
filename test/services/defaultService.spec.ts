@@ -278,6 +278,19 @@ describe('DefaultService', (): void => {
     };
 
     before(async (): Promise<void> => {
+        if (!process.env.MYSQL_TEST_HOST) {
+            throw new Error('MYSQL_TEST_HOST must be set');
+        }
+        if (!process.env.MYSQL_TEST_USER) {
+            throw new Error('MYSQL_TEST_USER must be set');
+        }
+        if (!process.env.MYSQL_TEST_PASSWORD) {
+            throw new Error('MYSQL_TEST_PASSWORD must be set');
+        }
+        if (!process.env.MYSQL_TEST_DB) {
+            throw new Error('MYSQL_TEST_DB must be set');
+        }
+
         connection = await TypeOrmManagerTest.connect(options, connectionName);
 
         await connection.manager.query(`

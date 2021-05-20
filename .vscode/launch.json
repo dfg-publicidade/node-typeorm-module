@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "address": "127.0.0.1",
+            "request": "attach",
+            "name": "Launch via NPM",
+            "timeout": 100000,
+            "port": 9229
+        }
+    ]
+}
