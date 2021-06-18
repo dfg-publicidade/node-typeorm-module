@@ -16,12 +16,12 @@
         "@dfgpublicidade/node-params-module": "git+https://github.com/dfg-publicidade/node-params-module.git",
         "@dfgpublicidade/node-strings-module": "git+https://github.com/dfg-publicidade/node-strings-module.git",
         "@dfgpublicidade/node-util-module": "git+https://github.com/dfg-publicidade/node-util-module.git",
-        "@types/mysql": "^2.15.16",
         "mysql": "^2.18.1",
         "typeorm": "^0.2.34"
     },
     "devDependencies": {
         "@dfgpublicidade/eslint-config": "git+ssh://git@github.com/dfg-publicidade/eslint-config.git",
+        "@types/mysql": "^2.15.16",
         "@typescript-eslint/eslint-plugin": "^4.26.1",
         "@typescript-eslint/eslint-plugin-tslint": "^4.26.1",
         "@typescript-eslint/parser": "^4.26.1",
