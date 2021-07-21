@@ -5,10 +5,9 @@
     "main": "dist/index.js",
     "scripts": {
         "check": "eslint src --ext .ts",
-        "compile:clean": "npm run check && gulp install && tsc --project tsconfig.json",
-        "compile": "tsc --project tsconfig.json",
-        "test": "TS_NODE_FILES=true NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" nyc --reporter=html --reporter=text mocha --exit --timeout=100000",
-        "test:all": "npm run test test/**/*.spec.ts test/**/**/*.spec.ts test/**/**/**/*.spec.ts"
+        "test": "DEBUG=module:* TS_NODE_FILES=true NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" nyc --reporter=html --reporter=text mocha --exit --timeout=100000",
+        "test:all": "npm run test test/**/*.spec.ts test/**/**/*.spec.ts test/**/**/**/*.spec.ts",
+        "compile": "npm run check && gulp install && tsc --project tsconfig.json"
     },
     "dependencies": {
         "@dfgpublicidade/node-app-module": "git+https://github.com/dfg-publicidade/node-app-module.git",
