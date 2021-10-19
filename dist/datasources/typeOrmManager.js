@@ -7,8 +7,8 @@ const node_util_module_1 = __importDefault(require("@dfgpublicidade/node-util-mo
 const debug_1 = __importDefault(require("debug"));
 const typeorm_1 = require("typeorm");
 /* Module */
-const debug = debug_1.default('module:typeorm-manager');
-const connectionManager = typeorm_1.getConnectionManager();
+const debug = (0, debug_1.default)('module:typeorm-manager');
+const connectionManager = (0, typeorm_1.getConnectionManager)();
 class TypeOrmManager {
     static async connect(config, name) {
         debug('Connection request received ');

@@ -16,7 +16,7 @@
         "@dfgpublicidade/node-strings-module": "git+https://github.com/dfg-publicidade/node-strings-module.git",
         "@dfgpublicidade/node-util-module": "git+https://github.com/dfg-publicidade/node-util-module.git",
         "mysql": "^2.18.1",
-        "typeorm": "^0.2.34"
+        "typeorm": "0.2.38"
     },
     "devDependencies": {
         "@dfgpublicidade/eslint-config": "git+ssh://git@github.com/dfg-publicidade/eslint-config.git",
